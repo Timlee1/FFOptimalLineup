@@ -11,7 +11,7 @@ POSITIONS = ["QB", "RB", "WR", "TE", "K", "DST"]
 
 
 def football_db_scraper_weekly():
-  columns =  ['Name', 'Position', 'Year', 'Week', 'Rank', 'Team', 'Standard Pts', 'Pass_Att', 'Pass_Cmp', 'Pass_Yds', 'Pass_TD', 'Int', 'Pass_2Pt', 'Rush_Att', 'Rush_Yds', 'Rush_TD', 'Rush_2Pt', 'Rec', 'Rec_Yds', 'Rec_TD', 'Rec_2Pt', 'FL', 'FL_TD', 'Half PPR Pts', 'PPR Pts', 'XPA', 'XPM', 'FGA', 'FGM', '50_Plus', 'DST_Sack', 'DST_Int', 'DST_Saf', 'DST_FR', 'DST_Blk', 'DST_TD', 'DST_PA', 'DST_Pass_Yds', 'DST_Rush_Yds', 'DST_Tot_Yds']
+  columns =  ['Name', 'Position', 'Year', 'Week', 'Rank', 'Team', 'Opponent', 'Standard Pts', 'Pass_Att', 'Pass_Cmp', 'Pass_Yds', 'Pass_TD', 'Int', 'Pass_2Pt', 'Rush_Att', 'Rush_Yds', 'Rush_TD', 'Rush_2Pt', 'Rec', 'Rec_Yds', 'Rec_TD', 'Rec_2Pt', 'FL', 'FL_TD', 'Half PPR Pts', 'PPR Pts', 'XPA', 'XPM', 'FGA', 'FGM', '50_Plus', 'DST_Sack', 'DST_Int', 'DST_Saf', 'DST_FR', 'DST_Blk', 'DST_TD', 'DST_PA', 'DST_Pass_Yds', 'DST_Rush_Yds', 'DST_Tot_Yds']
   df = pd.DataFrame(columns = columns)
   for year in YEARS:
     if year >= 2022:
@@ -33,7 +33,13 @@ def football_db_scraper_weekly():
             row_data = row.find_all("td")
             for ind in range(len(row_data)):
               if ind == 1:
-                line.append(row_data[ind].find("b").get_text())
+                game = row_data[ind].get_text().split("@")
+                team = row_data[ind].find("b").get_text()
+                opp = game[0]
+                if team == game[0]:
+                  opp = game[1]
+                line.append(team)
+                line.append(opp)
               if ind == 2:
                 line.append(float(row_data[ind].get_text()))
               if ind > 2:
@@ -49,18 +55,24 @@ def football_db_scraper_weekly():
           for index in range(1,len(table)):
             row = table[index]
             name = row.find("a").get_text()
-            rank = index-1
+            rank = index
             line = [name, pos, year, week, rank]
             row_data = row.find_all("td")
             for ind in range(len(row_data)):
               if ind == 1:
-                line.append(row_data[ind].find("b").get_text())
+                game = row_data[ind].get_text().split("@")
+                team = row_data[ind].find("b").get_text()
+                opp = game[0]
+                if team == game[0]:
+                  opp = game[1]
+                line.append(team)
+                line.append(opp)
               if ind == 2:
                 line.append(float(row_data[ind].get_text()))
                 for i in range(16):
                   line.append(0)
-                line.append(line[6])
-                line.append(line[6])
+                line.append(line[7])
+                line.append(line[7])
               if ind > 2:
                 line.append(int(row_data[ind].get_text()))
             while len(line) < len(columns):
@@ -71,18 +83,24 @@ def football_db_scraper_weekly():
           for index in range(1,len(table)):
             row = table[index]
             name = row.find("a").get_text()
-            rank = index-1
+            rank = index
             line = [name, pos, year, week, rank]
             row_data = row.find_all("td")
             for ind in range(len(row_data)):
               if ind == 1:
-                line.append(row_data[ind].find("b").get_text())
+                game = row_data[ind].get_text().split("@")
+                team = row_data[ind].find("b").get_text()
+                opp = game[0]
+                if team == game[0]:
+                  opp = game[1]
+                line.append(team)
+                line.append(opp)
               if ind == 2:
                 line.append(float(row_data[ind].get_text()))
                 for i in range(16):
                   line.append(0)
-                line.append(line[6])
-                line.append(line[6])
+                line.append(line[7])
+                line.append(line[7])
                 for i in range(5):
                   line.append(0)
               if ind == 3:
@@ -189,8 +207,8 @@ def find_team(line, df_weekly):
   return team
 
 def weekly_rec_pts(line):
-  std_pts = line[6]
-  rec = line[17]
+  std_pts = line[7]
+  rec = line[18]
   return (std_pts + .5*rec, std_pts + rec)
 
 def yearly_rec_pts(line):
@@ -198,5 +216,5 @@ def yearly_rec_pts(line):
   rec = line[15]
   return (std_pts + .5*rec, std_pts + rec)
 
-#football_db_scraper_weekly()
+football_db_scraper_weekly()
 #football_db_scraper_yearly()
