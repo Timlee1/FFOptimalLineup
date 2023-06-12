@@ -6,7 +6,7 @@ import os
 
 dirname = os.path.dirname(__file__)
 HEADERS = {'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'}
-YEARS = [2022]
+YEARS = [2018, 2019, 2020, 2021, 2022]
 POSITIONS = ["QB", "RB", "WR", "TE", "K", "DST"]
 
 
@@ -113,7 +113,7 @@ def football_db_scraper_weekly():
 
 def football_db_scraper_yearly():
   df_weekly = pd.read_csv(dirname + '\\' + 'weekly_data.csv') 
-  columns =  ['Name', 'Position', 'Year', 'Rank', 'Standard Pts', 'Pass_Att', 'Pass_Cmp', 'Pass_Yds', 'Pass_TD', 'Int', 'Pass_2Pt', 'Rush_Att', 'Rush_Yds', 'Rush_TD', 'Rush_2Pt', 'Rec', 'Rec_Yds', 'Rec_TD', 'Rec_2Pt', 'FL', 'FL_TD', 'Half PPR Pts', 'PPR Pts', 'XPA', 'XPM', 'FGA', 'FGM', '50_Plus', 'DST_Sack', 'DST_Int', 'DST_Saf', 'DST_FR', 'DST_Blk', 'DST_TD', 'DST_PA', 'DST_Pass_Yds', 'DST_Rush_Yds', 'DST_Tot_Yds', 'Team']
+  columns =  ['Name', 'Position', 'Year', 'Rank', 'Average Standard Pts', 'Pass_Att', 'Pass_Cmp', 'Pass_Yds', 'Pass_TD', 'Int', 'Pass_2Pt', 'Rush_Att', 'Rush_Yds', 'Rush_TD', 'Rush_2Pt', 'Rec', 'Rec_Yds', 'Rec_TD', 'Rec_2Pt', 'FL', 'FL_TD', 'Average Half PPR Pts', 'Average PPR Pts', 'XPA', 'XPM', 'FGA', 'FGM', '50_Plus', 'DST_Sack', 'DST_Int', 'DST_Saf', 'DST_FR', 'DST_Blk', 'DST_TD', 'DST_PA', 'DST_Pass_Yds', 'DST_Rush_Yds', 'DST_Tot_Yds', 'Team']
   df = pd.DataFrame(columns = columns)
   for year in YEARS:
     for pos in POSITIONS:
@@ -143,7 +143,15 @@ def football_db_scraper_yearly():
 
           team = find_team(line, df_weekly)
           line.append(team)
-          df.loc[len(df)] = line
+          if team is not None: 
+            if year >= 2022:
+              num_games = 17
+            else:
+              num_games = 16
+            line[4] = line[4]/num_games
+            line[21]= line[21]/num_games
+            line[22]= line[22]/num_games
+            df.loc[len(df)] = line 
 
       if pos == "K":
         for index in range(1,len(table)):
@@ -167,7 +175,15 @@ def football_db_scraper_yearly():
             line.append(0)
           team = find_team(line, df_weekly)
           line.append(team)
-          df.loc[len(df)] = line
+          if team is not None: 
+            if year >= 2022:
+              num_games = 17
+            else:
+              num_games = 16
+            line[4] = line[4]/num_games
+            line[21]= line[21]/num_games
+            line[22]= line[22]/num_games
+            df.loc[len(df)] = line 
 
       if pos == "DST":
         for index in range(1,len(table)):
@@ -196,14 +212,26 @@ def football_db_scraper_yearly():
               text = row_data[ind].get_text().replace(',','')
               line.append(float(text))  
           team = find_team(line, df_weekly)
-          line.append(team)            
-          df.loc[len(df)] = line     
+          line.append(team)
+          if team is not None: 
+            if year >= 2022:
+              num_games = 17
+            else:
+              num_games = 16
+            line[4] = line[4]/num_games
+            line[21]= line[21]/num_games
+            line[22]= line[22]/num_games
+            df.loc[len(df)] = line     
   df.to_csv(dirname + '\\'+'yearly_data.csv')
 
 def find_team(line, df_weekly):
   name = line[0]
   position = line[1]
-  team = df_weekly[(df_weekly['Position']==position) & (df_weekly['Name']==name)]['Team'].unique()[0]
+  year = line[2]
+  try:
+    team = df_weekly[(df_weekly['Position']==position) & (df_weekly['Name']==name) & (df_weekly['Year']==year)]['Team'].unique()[0]
+  except: 
+    team = None
   return team
 
 def weekly_rec_pts(line):
@@ -216,5 +244,5 @@ def yearly_rec_pts(line):
   rec = line[15]
   return (std_pts + .5*rec, std_pts + rec)
 
-football_db_scraper_weekly()
-#football_db_scraper_yearly()
+#football_db_scraper_weekly()
+football_db_scraper_yearly()
