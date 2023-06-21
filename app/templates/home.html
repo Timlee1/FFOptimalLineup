@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home Page
+{% endblock %}
+
+{% block content %}
+
+{% if current_user.is_authenticated %}
+
+<form action="" method="post" novalidate>
+  {{ form.hidden_tag() }}
+  <div class="d-flex flex-row flex-wrap bd-highlight mb-3 justify-content-center">
+    <div class=" p-2 bd-highlight">
+      {{ form.qb.label }}<br>
+      {{ form.qb() }}<br>
+    </div>
+    <div class="p-2 bd-highlight">
+      {{ form.rb.label }}<br>
+      {{ form.rb() }}<br>
+    </div>
+    <div class="p-2 bd-highlight">
+      {{ form.wr.label }}<br>
+      {{ form.wr() }}<br>
+    </div>
+    <div class="p-2 bd-highlight">
+      {{ form.te.label }}<br>
+      {{ form.te() }}<br>
+    </div>
+    <div class="p-2 bd-highlight">
+      {{ form.rb_wr.label }}<br>
+      {{ form.rb_wr() }}<br>
+    </div>
+    <div class="p-2 bd-highlight">
+      {{ form.rb_te.label }}<br>
+      {{ form.rb_te() }}<br>
+    </div>
+    <div class="p-2 bd-highlight">
+      {{ form.wr_te.label }}<br>
+      {{ form.wr_te() }}<br>
+    </div>
+    <div class="p-2 bd-highlight">
+      {{ form.rb_wr_te.label }}<br>
+      {{ form.rb_wr_te() }}<br>
+    </div>
+    <div class="p-2 bd-highlight">
+      {{ form.qb_rb_wr_te.label }}<br>
+      {{ form.qb_rb_wr_te() }}<br>
+    </div>
+    <div class="p-2 bd-highlight">
+      {{ form.k.label }}<br>
+      {{ form.k() }}<br>
+    </div>
+    <div class="p-2 bd-highlight">
+      {{ form.dst.label }}<br>
+      {{ form.dst() }}<br>
+    </div>
+    <div class="p-2 bd-highlight">
+      {{ form.scoring.label }}<br>
+      {{ form.scoring() }}<br>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center">
+    {{ form.submit() }}
+  </div>
+</form>
+
+<select class="selectpicker" data-live-search="true" multiple>
+  <option>Mustard</option>
+  <option>Ketchup</option>
+  <option>Barbecue</option>
+</select>
+
+<script>
+  $(function () {
+    $('select').selectpicker();
+  });
+</script>
+{% else %}
+<div>Landing Page</div>
+{% endif %}
+
+
+
+{% endblock %}
