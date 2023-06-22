@@ -7,64 +7,68 @@ Home Page
 {% block content %}
 
 {% if current_user.is_authenticated %}
-
-<form action="" method="post" novalidate>
-  {{ form.hidden_tag() }}
-  <div class="d-flex flex-row flex-wrap bd-highlight mb-3 justify-content-center">
-    <div class=" p-2 bd-highlight text-center">
-      {{ form.qb.label }}<br>
-      {{ form.qb() }}<br>
+<div class="d-flex justify-content-center font-weight-bold">
+  <h1>League Settings</h1>
+</div>
+<div class="d-flex justify-content-center">
+  <form action="" method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="d-flex flex-row flex-wrap bd-highlight mb-3 justify-content-center">
+      <div class=" p-2 bd-highlight text-center">
+        {{ form.qb.label }}<br>
+        {{ form.qb() }}<br>
+      </div>
+      <div class="p-2 bd-highlight text-center">
+        {{ form.rb.label }}<br>
+        {{ form.rb() }}<br>
+      </div>
+      <div class="p-2 bd-highlight text-center">
+        {{ form.wr.label }}<br>
+        {{ form.wr() }}<br>
+      </div>
+      <div class="p-2 bd-highlight text-center">
+        {{ form.te.label }}<br>
+        {{ form.te() }}<br>
+      </div>
+      <div class="p-2 bd-highlight text-center">
+        {{ form.rb_wr.label }}<br>
+        {{ form.rb_wr() }}<br>
+      </div>
+      <div class="p-2 bd-highlight text-center">
+        {{ form.rb_te.label }}<br>
+        {{ form.rb_te() }}<br>
+      </div>
+      <div class="p-2 bd-highlight text-center">
+        {{ form.wr_te.label }}<br>
+        {{ form.wr_te() }}<br>
+      </div>
+      <div class="p-2 bd-highlight text-center">
+        {{ form.rb_wr_te.label }}<br>
+        {{ form.rb_wr_te() }}<br>
+      </div>
+      <div class="p-2 bd-highlight text-center">
+        {{ form.qb_rb_wr_te.label }}<br>
+        {{ form.qb_rb_wr_te() }}<br>
+      </div>
+      <div class="p-2 bd-highlight text-center">
+        {{ form.k.label }}<br>
+        {{ form.k() }}<br>
+      </div>
+      <div class="p-2 bd-highlight text-center">
+        {{ form.dst.label }}<br>
+        {{ form.dst() }}<br>
+      </div>
+      <div class="p-2 bd-highlight text-center">
+        {{ form.scoring.label }}<br>
+        {{ form.scoring() }}<br>
+      </div>
     </div>
-    <div class="p-2 bd-highlight text-center">
-      {{ form.rb.label }}<br>
-      {{ form.rb() }}<br>
+    <div class="d-flex justify-content-center">
+      {{ form.submit() }}
     </div>
-    <div class="p-2 bd-highlight text-center">
-      {{ form.wr.label }}<br>
-      {{ form.wr() }}<br>
-    </div>
-    <div class="p-2 bd-highlight text-center">
-      {{ form.te.label }}<br>
-      {{ form.te() }}<br>
-    </div>
-    <div class="p-2 bd-highlight text-center">
-      {{ form.rb_wr.label }}<br>
-      {{ form.rb_wr() }}<br>
-    </div>
-    <div class="p-2 bd-highlight text-center">
-      {{ form.rb_te.label }}<br>
-      {{ form.rb_te() }}<br>
-    </div>
-    <div class="p-2 bd-highlight text-center">
-      {{ form.wr_te.label }}<br>
-      {{ form.wr_te() }}<br>
-    </div>
-    <div class="p-2 bd-highlight text-center">
-      {{ form.rb_wr_te.label }}<br>
-      {{ form.rb_wr_te() }}<br>
-    </div>
-    <div class="p-2 bd-highlight text-center">
-      {{ form.qb_rb_wr_te.label }}<br>
-      {{ form.qb_rb_wr_te() }}<br>
-    </div>
-    <div class="p-2 bd-highlight text-center">
-      {{ form.k.label }}<br>
-      {{ form.k() }}<br>
-    </div>
-    <div class="p-2 bd-highlight text-center">
-      {{ form.dst.label }}<br>
-      {{ form.dst() }}<br>
-    </div>
-    <div class="p-2 bd-highlight text-center">
-      {{ form.scoring.label }}<br>
-      {{ form.scoring() }}<br>
-    </div>
-  </div>
-  <div class="d-flex justify-content-center">
-    {{ form.submit() }}
-  </div>
-</form>
-<div class="d-flex px-lg-5">
+  </form>
+</div>
+<div class="d-flex px-lg-5 pb-2 pt-4">
   <div class="d-flex flex-row">
     <select name="player" id="player" class="selectpicker" data-live-search="true">
       {% for row in players %}
@@ -72,8 +76,8 @@ Home Page
       {% endfor %}
     </select>
   </div>
-  <div class="d-flex flex-row p-2">
-    <button name="addPlayer" id="addPlayer" class="addPlayer">Add Player</button>
+  <div class="d-flex flex-row pl-2">
+    <button type="button" class="btn btn-primary" name="addPlayer" id="addPlayer" class="addPlayer">Add Player</button>
   </div>
 </div>
 <div class="d-flex table-responsive-sm px-lg-5">
@@ -96,9 +100,8 @@ Home Page
         {% else %}
         <td class="col-3">@ {{player.opponent}}</td>
         {% endif %}
-        <td class="col-1" name="removePlayer" id="removePlayer" class="removePlayer" value={{player.id}}
-          onclick="removePlayer({{player.id}})">
-          <button>X</button>
+        <td class="col-1" name="removePlayer" id="removePlayer" class="removePlayer " onclick="removePlayer(player.id)">
+          <button type="button" class="btn btn-danger">X</button>
         </td>
       </tr>
       {% endfor %}
@@ -112,7 +115,8 @@ Home Page
 
 <script>
   $(document).ready(function () {
-    $("#player").selectpicker();
+    $("select").selectpicker();
+    $("#submit").addClass("btn btn-primary");
     function change_roster(type, player_id) {
       $.ajax({
         url: "/player",
@@ -134,14 +138,14 @@ Home Page
       success: function (data) {
         var html = "";
         for (var count = 0; count < data.length; count++) {
-          html += '<tr class="d-flex"><td class="col-2">' + data[count].position + '</td><td class="col-6">' + data[count].name + ' (' + data[count].position + ')</td><td class="col-3">'
+          html += '<tr class="d-flex"><td class="col-2">' + data[count].position + '</td><td class="col-6">' + data[count].name + ' (' + data[count].team + ')</td><td class="col-3">'
           if (data[count].home == true) {
             html += 'vs. '
           }
           else {
             html += '@ '
           }
-          html += data[count].opponent + '</td><td class="col-1" name="removePlayer" id="removePlayer" class="removePlayer" onclick="removePlayer(' + data[count].id + ')"><button>X</button></td></tr>'
+          html += data[count].opponent + '</td><td class="col-1" name="removePlayer" id="removePlayer" class="removePlayer" onclick="removePlayer(' + data[count].id + ')"><button type="button" class="btn btn-danger">X</button></td></tr>'
         }
         $("#roster").html(html);
       }
@@ -164,7 +168,7 @@ Home Page
           else {
             html += '@ '
           }
-          html += data[count].opponent + '</td><td class="col-1" name="removePlayer" id="removePlayer" class="removePlayer" onclick="removePlayer(' + data[count].id + ')"><button>X</button></td></tr>'
+          html += data[count].opponent + '</td><td class="col-1" name="removePlayer" id="removePlayer" class="removePlayer" onclick="removePlayer(' + data[count].id + ')"><button type="button" class="btn btn-danger">X</button></td></tr>'
         }
         $("#roster").html(html);
       }
