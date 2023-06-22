@@ -2,7 +2,7 @@ venv/
 migrations/
 logs/
 __pycache__/
-
+data/
 
 .ipynb_checkpoints/
 
