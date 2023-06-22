@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
@@ -38,8 +38,47 @@ def home():
                 db.session.commit()
                 flash('League Setting Saved')
                 return redirect(url_for('home'))
-        return render_template('home.html', title = 'Home', form=form)
+        players = Player.get_all_players()
+        roster = current_user.user_roster()
+        return render_template('home.html', title = 'Home', form=form, players=players, roster=roster)
     return render_template('home.html', title = 'Home')
+
+@app.route('/player', methods=['GET', 'POST'])
+def player():
+    if current_user.is_authenticated:
+        if request.method == 'POST':
+            if request.form['type'] == "add":
+                player_id = request.form['player_id']
+                #print(player_id)
+                if not current_user.is_player_on_user_roster(player_id):
+                    player_to_user = Roster(user_id=current_user.id, player_id=player_id)
+                    db.session.add(player_to_user)
+                    db.session.commit()
+                    flash('Roster Saved')
+                    
+            if request.form['type'] == "remove":
+                player_id = request.form['player_id']
+                if current_user.is_player_on_user_roster(player_id):
+                    db.session.query(Roster).filter(Roster.user_id==current_user.id).filter(Roster.player_id == player_id).delete()
+                    db.session.commit()
+                    flash('Roster Saved')
+
+            roster = current_user.user_roster().all()
+            data = []
+            for row in roster:
+                row_data = {
+                    'id':row.id,
+                    'position':row.position,
+                    'name':row.name,
+                    'team':row.team,
+                    'opponent':row.opponent,
+                    'home':row.home
+                }
+                data.append(row_data)
+            return jsonify(data)
+    return redirect(url_for('home'))
+
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -57,7 +96,6 @@ def login():
             next_page = url_for('home')
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
-
 
 @app.route('/logout')
 def logout():

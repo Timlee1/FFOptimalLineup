@@ -2,6 +2,7 @@ from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login
+from sqlalchemy import event
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -24,12 +25,19 @@ class User(UserMixin, db.Model):
         return League.query.filter_by(user_id=self.id).first()
     
     def user_roster(self):
-        return Roster.query.filter_by(user_id=self.id).first()
+        return Player.query.join(Roster, Player.id == Roster.player_id).filter_by(user_id=self.id)
     
     def has_league(self):
          if League.query.filter_by(user_id=self.id).count() > 0:
              return True 
          return False
+    
+    def is_player_on_user_roster(self, player_id):
+        if Roster.query.filter_by(user_id=self.id).filter_by(player_id=player_id).count() > 0:
+            return True 
+        return False 
+    def player_on_user_roster(self, player_id):
+        return Roster.query.filter_by(user_id=self.id).filter_by(player_id=player_id)
 
 class League(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -61,8 +69,20 @@ class Player(db.Model):
     position = db.Column(db.String(64))
     team = db.Column(db.String(64))
     opponent = db.Column(db.String(64))
+    home = db.Column(db.Boolean)
+    overall_rank = db.Column(db.Integer)
+    position_rank = db.Column(db.Integer)
     roster_setting = db.relationship('Roster', backref='author_player',lazy='dynamic')
+
+    def get_all_players():
+        return Player.query.all()
+    
+
+
+
 
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+
