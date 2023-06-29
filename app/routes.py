@@ -15,8 +15,8 @@ def home():
         if current_user.has_league():
             league_setting = current_user.user_league()
             setting = [league_setting.qb, league_setting.rb, league_setting.wr, league_setting.te, league_setting.rb_wr, league_setting.rb_te,
-                       league_setting.wr_te, league_setting.rb_wr_te, league_setting.qb_rb_wr_te, league_setting.k, league_setting.dst, league_setting.scoring]                    
-            form = LeagueFormTest(setting)
+                       league_setting.wr_te, league_setting.rb_wr_te, league_setting.qb_rb_wr_te, league_setting.kicker, league_setting.dst, league_setting.scoring]                    
+            form = createLeagueForm(setting)
             if form.validate_on_submit():
                 league_setting.qb = form.qb.data
                 league_setting.rb = form.rb.data
@@ -27,14 +27,14 @@ def home():
                 league_setting.wr_te = form.wr_te.data
                 league_setting.rb_wr_te = form.rb_wr_te.data
                 league_setting.qb_rb_wr_te = form.qb_rb_wr_te.data
-                league_setting.k = form.k.data
+                league_setting.kicker = form.kicker.data
                 league_setting.dst = form.dst.data
                 league_setting.scoring = form.scoring.data
                 db.session.commit()
                 flash('League Setting Saved')
                 return redirect(url_for('home'))
         else:
-            form = LeagueFormTest()
+            form = createLeagueForm()
             if form.validate_on_submit():
                 league_setting = League(qb=form.qb.data, user_id=current_user.id)
                 db.session.add(league_setting)
@@ -104,7 +104,7 @@ def login():
         return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = Users.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
             return redirect(url_for('login'))
@@ -126,7 +126,7 @@ def register():
         return redirect(url_for('home'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
+        user = Users(username=form.username.data, email=form.email.data)
         user.password = user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -140,7 +140,7 @@ def reset_password_request():
         return redirect(url_for('index'))
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = Users.query.filter_by(email=form.email.data).first()
         if user:
             send_password_reset_email(user)
         flash('Check your email for the instructions to reset your password')
@@ -152,7 +152,7 @@ def reset_password_request():
 def reset_password(token):
     if current_user.is_authenticated:
         return redirect(url_for('home'))
-    user = User.verify_reset_password_token(token)
+    user = Users.verify_reset_password_token(token)
     if not user:
         return redirect(url_for('home'))
     form = ResetPasswordForm()
@@ -167,7 +167,7 @@ def reset_password(token):
 def view_username():
     form = ViewUsernameRequestForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = Users.query.filter_by(email=form.email.data).first()
         if user:
             send_view_username_email(user)
         flash('Check your email to see your username')

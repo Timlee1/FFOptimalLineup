@@ -6,6 +6,169 @@ Home Page
 
 {% block content %}
 
-test
+{% if current_user.is_authenticated %}
+<div class="d-flex justify-content-center font-weight-bold">
+  <h1>Lineup Optimizer</h1>
+</div>
+
+<div class="d-flex px-lg-5 pb-2 pt-4">
+  <div class="d-flex flex-row">
+    <div>My Team</div>
+    <select name="player" id="player" class="selectpicker" data-live-search="true">
+      {% for row in players %}
+      <option value="{{row.id}}">{{row.name}} ({{row.position}})</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="d-flex flex-row pl-2">
+    <button type="button" class="btn btn-primary" name="addPlayer" id="addPlayer" class="addPlayer">Add Player</button>
+  </div>
+</div>
+<div class="d-flex table-responsive px-lg-5">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Position</th>
+        <th>Name</th>
+        <th>Opponent</th>
+        <th>Must Include</th>
+      </tr>
+    </thead>
+    <tbody name="roster" id="roster" class="roster">
+      {% for player in roster %}
+      <tr>
+        <td>{{player.position}}</td>
+        <td>{{player.name}} ({{player.team}})</td>
+        {% if player.home %}
+        <td>vs. {{player.opponent}}</td>
+        {% else %}
+        <td>@ {{player.opponent}}</td>
+        {% endif %}
+        <td name="removePlayer" id="removePlayer" class="removePlayer " onclick="removePlayer(player.id)">
+          <button type="button" class="btn btn-danger">X</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+
+  </table>
+
+</div>
+
+<div class="d-flex px-lg-5 pb-2 pt-4">
+  <div class="d-flex flex-row">
+    <div>Opponent Starting Lineup</div>
+    <select name="player" id="player" class="selectpicker" data-live-search="true">
+      {% for row in players %}
+      <option value="{{row.id}}">{{row.name}} ({{row.position}})</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="d-flex flex-row pl-2">
+    <button type="button" class="btn btn-primary" name="addPlayer" id="addPlayer" class="addPlayer">Add Player</button>
+  </div>
+</div>
+<div class="d-flex table-responsive px-lg-5">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Position</th>
+        <th>Name</th>
+        <th>Opponent</th>
+        <th>Remove</th>
+      </tr>
+    </thead>
+    <tbody name="roster" id="roster" class="roster">
+      {% for player in roster %}
+      <tr>
+        <td>{{player.position}}</td>
+        <td>{{player.name}} ({{player.team}})</td>
+        {% if player.home %}
+        <td>vs. {{player.opponent}}</td>
+        {% else %}
+        <td>@ {{player.opponent}}</td>
+        {% endif %}
+        <td class="" name="removePlayer" id="removePlayer" class="removePlayer " onclick="removePlayer(player.id)">
+          <button type="button" class="btn btn-danger">X</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+
+  </table>
+
+</div>
+
+
+
+<script>
+  $(document).ready(function () {
+    $("select").selectpicker();
+    $("#submit").addClass("btn btn-primary");
+    function change_roster(type, player_id) {
+      $.ajax({
+        url: "/player",
+        method: "POST",
+        data: { type: type, player_id: player_id },
+        dataType: "json"
+      })
+    };
+  }
+  )
+
+  $("#addPlayer").on("click", function () {
+    var player_id = $("#player").val();
+    $.ajax({
+      url: '/player',
+      type: "POST",
+      data: { type: "add", player_id: player_id },
+      dataType: "json",
+      success: function (data) {
+        var html = "";
+        for (var count = 0; count < data.length; count++) {
+          html += '<tr><td>' + data[count].position + '</td><td>' + data[count].name + ' (' + data[count].team + ')</td><td>'
+          if (data[count].home == true) {
+            html += 'vs. '
+          }
+          else {
+            html += '@ '
+          }
+          html += data[count].opponent + '</td><td name="removePlayer" id="removePlayer" class="removePlayer" onclick="removePlayer(' + data[count].id + ')"><button type="button" class="btn btn-danger">X</button></td></tr>'
+        }
+        $("#roster").html(html);
+      }
+    })
+  })
+
+  function removePlayer(player_id) {
+    $.ajax({
+      url: '/player',
+      type: "POST",
+      data: { type: "remove", player_id: player_id },
+      dataType: "json",
+      success: function (data) {
+        var html = "";
+        for (var count = 0; count < data.length; count++) {
+          html += '<tr><td>' + data[count].position + '</td><td>' + data[count].name + ' (' + data[count].position + ')</td><td>'
+          if (data[count].home == true) {
+            html += 'vs. '
+          }
+          else {
+            html += '@ '
+          }
+          html += data[count].opponent + '</td><td name="removePlayer" id="removePlayer" class="removePlayer" onclick="removePlayer(' + data[count].id + ')"><button type="button" class="btn btn-danger">X</button></td></tr>'
+        }
+        $("#roster").html(html);
+      }
+    })
+  }
+
+
+</script>
+{% else %}
+<div>Landing Page</div>
+{% endif %}
+
+
 
 {% endblock %}

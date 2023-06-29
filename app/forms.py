@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
-from app.models import User
+from app.models import Users
 
 
 class LoginForm(FlaskForm):
@@ -20,35 +20,16 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField('Register')
 
     def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
+        user = Users.query.filter_by(username=username.data).first()
         if user is not None:
             raise ValidationError('Please use a different username.')
 
     def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
+        user = Users.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email address.')
-          
-class LeagueForm(FlaskForm):
-    qb = SelectField('QB', choices=[1,2,3,4])
-    rb = SelectField('RB', choices=[1,2,3,4])
-    wr = SelectField('WR', choices=[1,2,3,4])
-    te = SelectField('TE', choices=[1,2,3,4])
-    rb_wr = SelectField('RB/WR', choices=[1,2,3,4])
-    rb_te = SelectField('RB/TE', choices=[1,2,3,4])
-    wr_te = SelectField('WR/TE', choices=[1,2,3,4])
-    rb_te = SelectField('RB/TE', choices=[1,2,3,4])
-    rb_wr_te = SelectField('RB/WR/TE', choices=[1,2,3,4])
-    qb_rb_wr_te = SelectField('QB/RB/WR/TE', choices=[1,2,3,4])
-    k = SelectField('K', choices=[1,2,3,4])
-    dst = SelectField('DST', choices=[1,2,3,4])
-    scoring = SelectField('Scoring', choices=["Standard","Half PPR", "PPR"])
-    submit = SubmitField('Save Settings')
-    
-    def __init__(self, **kwargs):
-        super().__init__()
 
-def LeagueFormTest(setting=None):
+def createLeagueForm(setting=None):
     class LeagueForm(FlaskForm):
         pass
     if setting is None:
@@ -61,7 +42,7 @@ def LeagueFormTest(setting=None):
         LeagueForm.wr_te = SelectField('WR/TE', choices=[1,2,3,4])
         LeagueForm.rb_wr_te = SelectField('RB/WR/TE', choices=[1,2,3,4])
         LeagueForm.qb_rb_wr_te = SelectField('QB/RB/WR/TE', choices=[1,2,3,4])
-        LeagueForm.k = SelectField('K', choices=[1,2,3,4])
+        LeagueForm.kicker = SelectField('K', choices=[1,2,3,4])
         LeagueForm.dst = SelectField('DST', choices=[1,2,3,4])
         LeagueForm.scoring = SelectField('Scoring', choices=["Standard","Half PPR", "PPR"])
         LeagueForm.submit = SubmitField('Save Settings')
@@ -75,7 +56,7 @@ def LeagueFormTest(setting=None):
         LeagueForm.wr_te = SelectField('WR/TE', choices=[1,2,3,4], coerce=int, default=setting[6])
         LeagueForm.rb_wr_te = SelectField('RB/WR/TE', choices=[1,2,3,4], coerce=int, default=setting[7])
         LeagueForm.qb_rb_wr_te = SelectField('QB/RB/WR/TE', choices=[1,2,3,4], coerce=int, default=setting[8])
-        LeagueForm.k = SelectField('K', choices=[1,2,3,4], coerce=int, default=setting[9])
+        LeagueForm.kicker = SelectField('K', choices=[1,2,3,4], coerce=int, default=setting[9])
         LeagueForm.dst = SelectField('DST', choices=[1,2,3,4], coerce=int, default=setting[10])
         LeagueForm.scoring = SelectField('Scoring', choices=["Standard","Half PPR", "PPR"], coerce=str, default=setting[11])
         LeagueForm.submit = SubmitField('Save Settings')

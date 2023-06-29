@@ -5,7 +5,7 @@ import jwt
 from time import time
 
 
-class User(UserMixin, db.Model):
+class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
@@ -34,7 +34,7 @@ class User(UserMixin, db.Model):
                             algorithms=['HS256'])['reset_password']
         except:
             return
-        return User.query.get(id)
+        return Users.query.get(id)
 
     def user_league(self):
         return League.query.filter_by(user_id=self.id).first()
@@ -77,32 +77,39 @@ class League(db.Model):
     rb_wr_te = db.Column(db.Integer)
     qb_rb_wr_te = db.Column(db.Integer)
     dst = db.Column(db.Integer)
-    k = db.Column(db.Integer)
+    kicker = db.Column(db.Integer)
     scoring = db.Column(db.String(64))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), unique=True)
     
     def __repr__(self):
         return '<League {}>'.format(self.qb)
 
 class Roster(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
 
 class OpponentRoster(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
 
 class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64))
-    position = db.Column(db.String(64))
+    player_name = db.Column(db.String(64))
+    pos = db.Column(db.String(64))
     team = db.Column(db.String(64))
     opponent = db.Column(db.String(64))
     home = db.Column(db.Boolean)
-    overall_rank = db.Column(db.Integer)
-    position_rank = db.Column(db.Integer)
+    proj_std = db.Column(db.Float)
+    avg_rank_std = db.Column(db.Float)
+    sdev_rank_std = db.Column(db.Float)
+    proj_half = db.Column(db.Float)
+    avg_rank_half = db.Column(db.Float)
+    sdev_rank_half = db.Column(db.Float)
+    proj_ppr = db.Column(db.Float)
+    avg_rank_ppr = db.Column(db.Float)
+    sdev_rank_ppr = db.Column(db.Float)
     roster_setting = db.relationship('Roster', backref='author_player',lazy='dynamic')
 
     def get_all_players():
@@ -110,6 +117,6 @@ class Player(db.Model):
     
 @login.user_loader
 def load_user(id):
-    return User.query.get(int(id))
+    return Users.query.get(int(id))
 
 
