@@ -51,8 +51,19 @@ class User(UserMixin, db.Model):
         if Roster.query.filter_by(user_id=self.id).filter_by(player_id=player_id).count() > 0:
             return True 
         return False 
+    
     def player_on_user_roster(self, player_id):
         return Roster.query.filter_by(user_id=self.id).filter_by(player_id=player_id)
+    
+    def user_opponent_roster(self):
+        return Player.query.join(OpponentRoster, Player.id == OpponentRoster.player_id).filter_by(user_id=self.id)
+    
+    def is_player_on_user_opponent_roster(self, player_id):
+        if OpponentRoster.query.filter_by(user_id=self.id).filter_by(player_id=player_id).count() > 0:
+            return True 
+
+    def player_on_user_opponent_roster(self, player_id):
+        return OpponentRoster.query.filter_by(user_id=self.id).filter_by(player_id=player_id)
 
 class League(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -74,6 +85,11 @@ class League(db.Model):
         return '<League {}>'.format(self.qb)
 
 class Roster(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+
+class OpponentRoster(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
