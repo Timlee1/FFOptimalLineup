@@ -43,7 +43,9 @@ def home():
                 return redirect(url_for('home'))
         players = Player.get_all_players()
         roster = current_user.user_roster()
+        roster = sort_by_position(roster)
         opponent_roster = current_user.user_opponent_roster()
+        opponent_roster = sort_by_position(opponent_roster)
         return render_template('home.html', title = 'Home', form=form, players=players, roster=roster, opponent_roster=opponent_roster)
     return render_template('home.html', title = 'Home')
 
@@ -54,13 +56,13 @@ def player():
             if request.form['add_or_remove'] == "add":
                 player_id = request.form['player_id']
                 if request.form['roster_type'] == "roster":
-                    if not current_user.is_player_on_user_roster(player_id):
+                    if not current_user.is_player_on_user_roster(player_id) and not current_user.is_player_on_user_opponent_roster(player_id):
                         player_to_user = Roster(user_id=current_user.id, player_id=player_id)
                         db.session.add(player_to_user)
                         db.session.commit()
                         flash('Roster Saved')
                 else:
-                    if not current_user.is_player_on_user_opponent_roster(player_id):
+                    if not current_user.is_player_on_user_opponent_roster(player_id) and not current_user.is_player_on_user_roster(player_id) :
                         player_to_user = OpponentRoster(user_id=current_user.id, player_id=player_id)
                         db.session.add(player_to_user)
                         db.session.commit()
@@ -83,13 +85,14 @@ def player():
                 roster = current_user.user_roster().all()
             else:
                 roster = current_user.user_opponent_roster().all()
+            roster = sort_by_position(roster)
             roster_type = {'roster_type': request.form['roster_type']}
             data.append(roster_type)
             for row in roster:
                 row_data = {
                     'id':row.id,
-                    'position':row.position,
-                    'name':row.name,
+                    'pos':row.pos,
+                    'player_name':row.player_name,
                     'team':row.team,
                     'opponent':row.opponent,
                     'home':row.home
@@ -183,3 +186,32 @@ def lineup():
 @app.route('/wdis')
 def wdis():
     return render_template('wdis.html', title = 'Who Should I Start')
+
+
+def sort_by_position(roster):
+    res = [] 
+    qb = [] 
+    rb = [] 
+    wr = []
+    te = []
+    kicker = []
+    dst = []
+    rest = []
+    for player in roster:
+        if player.pos == "QB":
+            qb.append(player)
+        elif player.pos == "RB":
+            rb.append(player)
+        elif player.pos == "WR":
+            wr.append(player)
+        elif player.pos == "TE":
+            te.append(player)
+        elif player.pos == "K":
+            kicker.append(player)
+        elif player.pos == "DST":
+            dst.append(player)
+        else:
+            rest.append(player)
+    res = qb + rb + wr + te + kicker + dst + rest
+    return res
+

@@ -75,7 +75,7 @@ Home Page
   <div class="d-flex flex-row flex-wrap pl-2">
     <select name="player" id="player" class="selectpicker" data-live-search="true">
       {% for row in players %}
-      <option value="{{row.id}}">{{row.name}} ({{row.position}})</option>
+      <option value="{{row.id}}">{{row.player_name}} ({{row.pos}})</option>
       {% endfor %}
     </select>
   </div>
@@ -97,8 +97,8 @@ Home Page
     <tbody name="roster" id="roster" class="roster">
       {% for player in roster %}
       <tr>
-        <td>{{player.position}}</td>
-        <td>{{player.name}} ({{player.team}})</td>
+        <td>{{player.pos}}</td>
+        <td>{{player.player_name}} ({{player.team}})</td>
         {% if player.home %}
         <td>vs. {{player.opponent}}</td>
         {% else %}
@@ -120,7 +120,7 @@ Home Page
   <div class="d-flex flex-row flex-wrap pl-2">
     <select name="opponent_player" id="opponent_player" class="selectpicker" data-live-search="true">
       {% for row in players %}
-      <option value="{{row.id}}">{{row.name}} ({{row.position}})</option>
+      <option value="{{row.id}}">{{row.player_name}} ({{row.pos}})</option>
       {% endfor %}
     </select>
   </div>
@@ -142,8 +142,8 @@ Home Page
     <tbody name="opponentRoster" id="opponentRoster" class="opponentRoster">
       {% for player in opponent_roster %}
       <tr>
-        <td>{{player.position}}</td>
-        <td>{{player.name}} ({{player.team}})</td>
+        <td>{{player.pos}}</td>
+        <td>{{player.player_name}} ({{player.team}})</td>
         {% if player.home %}
         <td>vs. {{player.opponent}}</td>
         {% else %}
@@ -184,7 +184,7 @@ Home Page
       success: function (data) {
         var html = "";
         for (var count = 1; count < data.length; count++) {
-          html += '<tr><td>' + data[count].position + '</td><td>' + data[count].name + ' (' + data[count].team + ')</td><td>'
+          html += '<tr><td>' + data[count].pos + '</td><td>' + data[count].player_name + ' (' + data[count].team + ')</td><td>'
           if (data[count].home == true) {
             html += 'vs. '
           }
