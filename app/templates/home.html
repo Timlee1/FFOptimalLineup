@@ -14,53 +14,53 @@ Home Page
   <form action="" method="post" novalidate>
     {{ form.hidden_tag() }}
     <div class="d-flex flex-row flex-wrap bd-highlight mb-3 justify-content-center">
-      <div class=" p-2 bd-highlight text-center">
+      <div class="p-2 bd-highlight text-center">
         {{ form.qb.label }}<br>
-        {{ form.qb() }}<br>
+        {{ form.qb(class_="bg-light border-0 fw-bold") }}<br>
       </div>
       <div class="p-2 bd-highlight text-center">
         {{ form.rb.label }}<br>
-        {{ form.rb() }}<br>
+        {{ form.rb(class_="bg-light border-0") }}<br>
       </div>
       <div class="p-2 bd-highlight text-center">
         {{ form.wr.label }}<br>
-        {{ form.wr() }}<br>
+        {{ form.wr(class_="bg-light border-0") }}<br>
       </div>
       <div class="p-2 bd-highlight text-center">
         {{ form.te.label }}<br>
-        {{ form.te() }}<br>
+        {{ form.te(class_="bg-light border-0") }}<br>
       </div>
       <div class="p-2 bd-highlight text-center">
         {{ form.rb_wr.label }}<br>
-        {{ form.rb_wr() }}<br>
+        {{ form.rb_wr(class_="bg-light border-0") }}<br>
       </div>
       <div class="p-2 bd-highlight text-center">
         {{ form.rb_te.label }}<br>
-        {{ form.rb_te() }}<br>
+        {{ form.rb_te(class_="bg-light border-0") }}<br>
       </div>
       <div class="p-2 bd-highlight text-center">
         {{ form.wr_te.label }}<br>
-        {{ form.wr_te() }}<br>
+        {{ form.wr_te(class_="bg-light border-0") }}<br>
       </div>
       <div class="p-2 bd-highlight text-center">
         {{ form.rb_wr_te.label }}<br>
-        {{ form.rb_wr_te() }}<br>
+        {{ form.rb_wr_te(class_="bg-light border-0") }}<br>
       </div>
       <div class="p-2 bd-highlight text-center">
         {{ form.qb_rb_wr_te.label }}<br>
-        {{ form.qb_rb_wr_te() }}<br>
+        {{ form.qb_rb_wr_te(class_="bg-light border-0") }}<br>
       </div>
       <div class="p-2 bd-highlight text-center">
         {{ form.kicker.label }}<br>
-        {{ form.kicker() }}<br>
+        {{ form.kicker(class_="bg-light border-0") }}<br>
       </div>
       <div class="p-2 bd-highlight text-center">
         {{ form.dst.label }}<br>
-        {{ form.dst() }}<br>
+        {{ form.dst(class_="bg-light border-0") }}<br>
       </div>
       <div class="p-2 bd-highlight text-center">
         {{ form.scoring.label }}<br>
-        {{ form.scoring() }}<br>
+        {{ form.scoring(class_="bg-light border-0") }}<br>
       </div>
     </div>
     <div class="d-flex justify-content-center">
@@ -69,107 +69,115 @@ Home Page
   </form>
 </div>
 <div class="d-flex px-lg-3 px-2 pb-2 pt-4 flex-wrap">
-  <div class="d-flex flex-row flex-wrap pl-2">
-    <h2>My Team (Include Bench)</h2>
+  <div class=" d-flex flex-column col-md-6">
+    <div class="d-flex flex-row flex-wrap pb-1">
+      <h2>My Entire Team</h2>
+    </div>
+    <div class="d-flex pb-3">
+      <div class="d-flex flex-row flex-wrap">
+        <select name="player" id="player" class="selectpicker" data-live-search="true">
+          {% for row in players %}
+          <option value="{{row.id}}">{{row.player_name}} ({{row.pos}})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="d-flex flex-row flex-wrap pl-2">
+        <button type="button" class="btn btn-primary" name="addPlayer" id="addPlayer" class="addPlayer"
+          onclick="add_player_to_roster()">Add Player</button>
+      </div>
+    </div>
+    <div class="d-flex table-responsive">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Pos</th>
+            <th>Name</th>
+            <th>Opponent</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody name="roster" id="roster" class="roster">
+          {% for player in roster %}
+          <tr>
+            <td>{{player.pos}}</td>
+            <td>{{player.player_name}} ({{player.team}})</td>
+            {% if player.home %}
+            <td>vs. {{player.opponent}}</td>
+            {% else %}
+            <td>@ {{player.opponent}}</td>
+            {% endif %}
+            <td name="removePlayer" id="removePlayer" class="removePlayer"
+              onclick="remove_player_from_roster('{{player.id}}')">
+              <button type="button" class="btn btn-danger">X</button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
-  <div class="d-flex flex-row flex-wrap pl-2">
-    <select name="player" id="player" class="selectpicker" data-live-search="true">
-      {% for row in players %}
-      <option value="{{row.id}}">{{row.player_name}} ({{row.pos}})</option>
-      {% endfor %}
-    </select>
+  <div class="d-flex flex-column col-md-6">
+    <div class="d-flex flex-row flex-wrap pb-1">
+      <h2>Opponent Starting Lineup</h2>
+    </div>
+    <div class="d-flex pb-3">
+      <div class="d-flex flex-row flex-wrap">
+        <select name="opponent_player" id="opponent_player" class="selectpicker" data-live-search="true">
+          {% for row in players %}
+          <option value="{{row.id}}">{{row.player_name}} ({{row.pos}})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="d-flex flex-row flex-wrap pl-2">
+        <button type="button" class="btn btn-primary" name="addPlayer" id="addPlayer" class="addPlayer"
+          onclick="add_player_to_opponent_roster()">Add Player</button>
+      </div>
+    </div>
+
+    <div class="d-flex table-responsive">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Pos</th>
+            <th>Name</th>
+            <th>Opponent</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody name="opponentRoster" id="opponentRoster" class="opponentRoster">
+          {% for player in opponent_roster %}
+          <tr>
+            <td>{{player.pos}}</td>
+            <td>{{player.player_name}} ({{player.team}})</td>
+            {% if player.home %}
+            <td>vs. {{player.opponent}}</td>
+            {% else %}
+            <td>@ {{player.opponent}}</td>
+            {% endif %}
+            <td name="removePlayer" id="removePlayer" class="removePlayer"
+              onclick="remove_player_from_opponent_roster('{{player.id}}')">
+              <button type="button" class="btn btn-danger">X</button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
-  <div class="d-flex flex-row flex-wrap pl-2">
-    <button type="button" class="btn btn-primary" name="addPlayer" id="addPlayer" class="addPlayer"
-      onclick="add_player_to_roster()">Add Player</button>
-  </div>
+
 </div>
-<div class="d-flex table-responsive px-lg-3 px-2">
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Pos</th>
-        <th>Name</th>
-        <th>Opponent</th>
-        <th>Remove</th>
-      </tr>
-    </thead>
-    <tbody name="roster" id="roster" class="roster">
-      {% for player in roster %}
-      <tr>
-        <td>{{player.pos}}</td>
-        <td>{{player.player_name}} ({{player.team}})</td>
-        {% if player.home %}
-        <td>vs. {{player.opponent}}</td>
-        {% else %}
-        <td>@ {{player.opponent}}</td>
-        {% endif %}
-        <td name="removePlayer" id="removePlayer" class="removePlayer"
-          onclick="remove_player_from_roster('{{player.id}}')">
-          <button type="button" class="btn btn-danger">X</button>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-<div class="d-flex px-lg-3 px-2 pb-2 pt-4 flex-wrap">
-  <div class="d-flex flex-row flex-wrap pl-2">
-    <h2>Opponent Starting Lineup</h2>
-  </div>
-  <div class="d-flex flex-row flex-wrap pl-2">
-    <select name="opponent_player" id="opponent_player" class="selectpicker" data-live-search="true">
-      {% for row in players %}
-      <option value="{{row.id}}">{{row.player_name}} ({{row.pos}})</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="d-flex flex-row flex-wrap pl-2">
-    <button type="button" class="btn btn-primary" name="addPlayer" id="addPlayer" class="addPlayer"
-      onclick="add_player_to_opponent_roster()">Add Player</button>
-  </div>
-</div>
-<div class="d-flex table-responsive px-lg-3 px-2">
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Pos</th>
-        <th>Name</th>
-        <th>Opponent</th>
-        <th>Remove</th>
-      </tr>
-    </thead>
-    <tbody name="opponentRoster" id="opponentRoster" class="opponentRoster">
-      {% for player in opponent_roster %}
-      <tr>
-        <td>{{player.pos}}</td>
-        <td>{{player.player_name}} ({{player.team}})</td>
-        {% if player.home %}
-        <td>vs. {{player.opponent}}</td>
-        {% else %}
-        <td>@ {{player.opponent}}</td>
-        {% endif %}
-        <td name="removePlayer" id="removePlayer" class="removePlayer"
-          onclick="remove_player_from_opponent_roster('{{player.id}}')">
-          <button type="button" class="btn btn-danger">X</button>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+
 <div class="d-flex justify-content-center">
   <button type="button" class="btn btn-primary">Run Simulation</button>
 </div>
 
 
 
+
 <script>
   $(document).ready(function () {
-    $("select").selectpicker();
+    $("#select").addClass("bg-light");
     $("#submit").addClass("btn btn-primary");
-    document.getElementsByClassName('dropdown')[12].style.height = "100%";
-    document.getElementsByClassName('dropdown')[13].style.height = "100%";
     for (var count = 13; count < document.getElementsByClassName('btn').length; count++) {
       document.getElementsByClassName('btn')[count].style.height = "100%";
     }

@@ -178,10 +178,45 @@ def view_username():
     return render_template('view_username.html',
                            title='View Username', form=form)
 
-@app.route('/lineup')
+@app.route('/lineup', methods=['GET', 'POST'])
 def lineup():
-    roster = current_user.user_roster() 
-    return render_template('lineup.html', title = 'Optimize Lineup', roster = roster)
+    if current_user.is_authenticated:
+        if current_user.has_league():
+            league_setting = current_user.user_league()
+            setting = [league_setting.qb, league_setting.rb, league_setting.wr, league_setting.te, league_setting.rb_wr, league_setting.rb_te,
+                       league_setting.wr_te, league_setting.rb_wr_te, league_setting.qb_rb_wr_te, league_setting.kicker, league_setting.dst, league_setting.scoring]                    
+            form = createLeagueForm(setting)
+            if form.validate_on_submit():
+                league_setting.qb = form.qb.data
+                league_setting.rb = form.rb.data
+                league_setting.wr = form.wr.data
+                league_setting.te = form.te.data
+                league_setting.rb_wr = form.rb_wr.data
+                league_setting.rb_te = form.rb_te.data
+                league_setting.wr_te = form.wr_te.data
+                league_setting.rb_wr_te = form.rb_wr_te.data
+                league_setting.qb_rb_wr_te = form.qb_rb_wr_te.data
+                league_setting.kicker = form.kicker.data
+                league_setting.dst = form.dst.data
+                league_setting.scoring = form.scoring.data
+                db.session.commit()
+                flash('League Setting Saved')
+                return redirect(url_for('lineup'))
+        else:
+            form = createLeagueForm()
+            if form.validate_on_submit():
+                league_setting = League(qb=form.qb.data, user_id=current_user.id)
+                db.session.add(league_setting)
+                db.session.commit()
+                flash('League Setting Saved')
+                return redirect(url_for('lineup'))
+        players = Player.get_all_players()
+        roster = current_user.user_roster()
+        roster = sort_by_position(roster)
+        opponent_roster = current_user.user_opponent_roster()
+        opponent_roster = sort_by_position(opponent_roster)
+        return render_template('lineup.html', title = 'lineup', form=form, players=players, roster=roster, opponent_roster=opponent_roster)
+    return render_template('lineup.html', title = 'lineup')
 
 @app.route('/wdis')
 def wdis():
